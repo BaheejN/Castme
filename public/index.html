@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <script>
+      (function () {
+        if (typeof window.ResizeObserver === 'undefined') return;
+        try {
+          var Original = window.ResizeObserver;
+          window.ResizeObserver = function (callback) {
+            return new Original(function () {
+              var self = this;
+              var args = arguments;
+              window.requestAnimationFrame(function () {
+                callback.apply(self, args);
+              });
+            });
+          };
+          window.ResizeObserver.prototype = Original.prototype;
+        } catch (e) {}
+        window.addEventListener(
+          'error',
+          function (e) {
+            if (e && typeof e.message === 'string' && e.message.indexOf('ResizeObserver loop') !== -1) {
+              e.stopImmediatePropagation();
+              e.preventDefault();
+            }
+          },
+          true
+        );
+        var ce = console.error;
+        console.error = function () {
+          var msg = arguments.length && String(arguments[0]);
+          if (msg && msg.indexOf('ResizeObserver loop') !== -1) return;
+          ce.apply(console, arguments);
+        };
+      })();
+    </script>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Castmee</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>
